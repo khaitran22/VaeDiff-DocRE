@@ -3,7 +3,9 @@ Source code for the paper: "[VaeDiff-DocRE: End-to-end Data Augmentation for Doc
 
 Don't hesitate to send us an e-mail or report an issue, if something is broken (and it shouldn't be) or if you have further questions.
 
-Contact person: Khai Tran, [phankhai.tran@uq.edu.au](mailto:phankhai.tran@uq.edu.au)
+Please follow instructions in `README` of each folder for setting up environment.
+
+Contact person: **Khai Tran**, [phankhai.tran@uq.edu.au](mailto:phankhai.tran@uq.edu.au)
 
 ## Citation
 If you find our work useful, please cite our work as:
