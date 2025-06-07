@@ -16,8 +16,10 @@ from copy import deepcopy
 from evaluation import *
 from tqdm import tqdm
 
+import wandb
+
 import autoRun
-autoRun.choose_gpu(n_gpus=1, retry=True, min_gpu_memory=8000, sleep_time=30)
+autoRun.choose_gpu(n_gpus=1, retry=True, min_gpu_memory=10000, sleep_time=30)
 
 
 def get_lr(optimizer):
@@ -79,10 +81,11 @@ def train(args, model, train_features, dev_features, test_features, label_loader
                     scheduler.step()
                     model.zero_grad()
                     num_steps += 1
-
+                wandb.log({"loss": loss.item()}, step=num_steps)
                 if (step + 1) == len(train_dataloader) - 1 or ((args.evaluation_steps > 0 and num_steps % args.evaluation_steps == 0 and step % args.gradient_accumulation_steps == 0) and num_steps > args.start_steps):
                     dev_score, dev_output = evaluate(
                         args, model, dev_features, label_loader, tag="dev")
+                    wandb.log(dev_output, step=num_steps)
                     lm_lr, classifier_lr = get_lr(optimizer)
                     print('Current Step: {:d},  Current LM lr: {:.5e}, Current Classifier lr: {:.5e}'.format(
                         num_steps, lm_lr, classifier_lr))
@@ -324,6 +327,7 @@ def main():
     parser.add_argument("--tau_base", default=1.0, type=float, help="tau_base")
 
     args = parser.parse_args()
+    wandb.init(project="VaeDiff-DocRE-Stage1",  mode='disabled')
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     args.n_gpu = torch.cuda.device_count()
@@ -400,31 +404,6 @@ def main():
         print(dev_output)
         train(args, model, train_features,
               dev_features, test_features, label_loader)
-    elif args.knowledge_distil != "":  # KD-Pre-Training
-        print('KD_pretraining')
-        student_model = AutoModel.from_pretrained(args.model_name_or_path,
-                                                  from_tf=bool(
-                                                      ".ckpt" in args.model_name_or_path),
-                                                  config=config,
-                                                  )
-        student_model = DocREModel_KD(
-            args, config, student_model, num_labels=args.num_labels)
-        student_model.to(0)
-        train(args, student_model, train_features,
-              dev_features, test_features, label_loader)
-    elif args.teacher_path != "":  # KD inference logits
-        # model = amp.initialize(model, opt_level="O1", verbosity=0)
-        model.load_state_dict(torch.load(args.teacher_path), strict=False)
-        dev_score, dev_output = evaluate(
-            args, model, dev_features, label_loader, tag="dev")
-        print(dev_output)
-        pred, logits = report(args, model, train_features, label_loader)
-        new_features = add_logits_to_features(train_features, logits)
-        torch.save(new_features, os.path.join(
-            args.data_dir, args.train_file + suffix))
-
-        with open(args.output_name, "w") as fh:
-            json.dump(pred, fh)
     elif args.load_path != "":  # Testing
         # model = amp.initialize(model, opt_level="O1", verbosity=0)
         model.load_state_dict(torch.load(args.load_path), strict=False)

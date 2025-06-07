@@ -4,8 +4,8 @@ import torch
 import numpy as np
 import pandas as pd
 
-docred_rel2id = json.load(open('./docred_data/meta/rel2id.json', 'r'))
-docred_ner2id = json.load(open('./docred_data/meta/ner2id.json', 'r'))
+docred_rel2id = json.load(open('/scratch/user/uqptran9/Code/VaeDiff-DocRE/docred_data/meta/rel2id.json', 'r'))
+docred_ner2id = json.load(open('/scratch/user/uqptran9/Code/VaeDiff-DocRE/docred_data/meta/ner2id.json', 'r'))
 
 cdr_rel2id = {'1:NR:2': 0, '1:CID:2': 1}
 gda_rel2id = {'1:NR:2': 0, '1:GDA:2': 1}

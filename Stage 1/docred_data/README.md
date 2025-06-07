@@ -1,1 +1,0 @@
-Download [Re-DocRED](https://github.com/tonytan48/Re-DocRED) dataset and place all files in this folder.

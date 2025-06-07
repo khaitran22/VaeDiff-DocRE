@@ -1,0 +1,35 @@
+python3 train.py \
+ --data_dir ./docred_data/ \
+ --transformer_type bert \
+ --model_name_or_path bert-base-cased \
+ --train_file train_revised.json \
+ --dev_file dev_revised.json \
+ --test_file test_revised.json \
+ --train_batch_size 8 \
+ --test_batch_size 8 \
+ --gradient_accumulation_steps 1 \
+ --num_labels 4 \
+ --lr_vae 2e-4 \
+ --learning_rate_min_vae 2e-5 \
+ --lr_diffnet 5e-5 \
+ --learning_rate_min_diff 5e-5 \
+ --max_grad_norm 1.0 \
+ --num_train_epochs 100.0 \
+ --seed 66 \
+ --num_class 97 \
+ --tau 1.0 \
+ --tau_base 0.5 \
+ --save_path_vae ./chkpoints/vae_roberta.pt \
+ --save_path_diff ./chkpoints/diff_ema_roberta.pt \
+ --diffusion_steps 50 \
+ --noise_schedule cosine \
+ --training \
+ --latent_size 384 \
+ --tx_dim 256 \
+ --class_conditional \
+ --self_condition \
+ --scale_shift \
+ --warmup_epochs 10 \
+ --predict_xstart \
+ --th_prob 0.2 \
+ --evaluation_steps 5000
