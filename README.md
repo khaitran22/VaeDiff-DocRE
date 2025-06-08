@@ -1,7 +1,9 @@
 # VaeDiff-DocRE
 Source code for the paper: "[VaeDiff-DocRE: End-to-end Data Augmentation for Document-level Relation Extraction via Variational Autoencoder and Diffusion Prior](https://aclanthology.org/2025.coling-main.488/)", has been accepted at COLING 2025.
 
-Please follow instructions in `README` of each folder for setting up environment. Trained models for Stage 2 and Stage 3 are [here](https://drive.google.com/file/d/1EHDDvZewVaTEZ7iebPrGoilTOo8u1g7R/view?usp=sharing).
+Please follow instructions in `README` of each folder for setting up environment.
+
+Trained models for Stage 2 and Stage 3 are [here](https://drive.google.com/file/d/1EHDDvZewVaTEZ7iebPrGoilTOo8u1g7R/view?usp=sharing).
 
 Don't hesitate to send us an e-mail or report an issue, if something is broken (and it shouldn't be) or if you have further questions.
 
