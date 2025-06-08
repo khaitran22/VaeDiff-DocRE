@@ -12,3 +12,8 @@ Implementation of Stage 2 in VaeDiff-DocRE.
 ```sh
 >> bash VaeDiff-DocRE/Stage_2/scripts/train.sh
 ```
+
+## Evaluation
+```sh
+>> bash VaeDiff-DocRE/Stage_2/scripts/eval.sh
+```
