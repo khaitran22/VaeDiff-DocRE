@@ -19,8 +19,8 @@ python3 train.py \
  --num_class 97 \
  --tau 1.0 \
  --tau_base 0.5 \
- --save_path_vae VaeDiff-DocRE/Stage_2/chkpoints/vae_roberta.pt \
- --save_path_diff VaeDiff-DocRE/Stage_2/chkpoints/diff_ema_roberta.pt \
+ --load_path_vae VaeDiff-DocRE/Stage_2/chkpoints/vae_roberta.pt \
+ --load_path_diff VaeDiff-DocRE/Stage_2/chkpoints/diff_ema_roberta.pt \
  --diffusion_steps 50 \
  --noise_schedule cosine \
  --training \
@@ -32,4 +32,5 @@ python3 train.py \
  --warmup_epochs 10 \
  --predict_xstart \
  --th_prob 0.2 \
- --evaluation_steps 5000
+ --evaluation_steps 5000 \
+ --evaluation

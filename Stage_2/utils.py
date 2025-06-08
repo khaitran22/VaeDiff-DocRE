@@ -176,6 +176,8 @@ def build_models(args, config, encoder):
     # EP-VAE
     vae = VAE(args, config)
     vae.to(args.device)
+    if args.load_path_vae != "":
+        vae.load_state_dict(torch.load(args.load_path_vae))
 
     # Diff
     diffusion_net = DiffusionTransformer(
@@ -198,6 +200,8 @@ def build_models(args, config, encoder):
         update_every=1
     )
     ema_diffusion.to(args.device)
+    if args.load_path_diff != "":
+        ema_diffusion.load_state_dict(torch.load(args.load_path_ema_diff))
     
     return model, vae, diffusion_net, ema_diffusion
 

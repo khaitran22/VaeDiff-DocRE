@@ -28,9 +28,12 @@ def main():
     parser.add_argument("--test_file", default="test.json", type=str)
     parser.add_argument("--save_path_vae", default="", type=str)
     parser.add_argument("--save_path_diff", default="", type=str)
+    parser.add_argument("--load_path_vae", default="", type=str)
+    parser.add_argument("--load_path_diff", default="", type=str)
     parser.add_argument("--save_last", default="", type=str)
     parser.add_argument("--load_baseline", default="", type=str)
     parser.add_argument("--output_name", default="result.json", type=str)
+    parser.add_argument('--evaluation', action='store_true', default=False)
 
     parser.add_argument("--config_name", default="", type=str,
                         help="Pretrained config name or path if not the same as model_name")
@@ -203,7 +206,11 @@ def main():
         dev_dataloader=dev_dataloader,
         test_dataloader=test_dataloader
     )
-    trainer.train(wandb)
+    if not args.evaluation:
+        trainer.train(wandb)
+    else:
+        current_nll_losses = trainer.eval()
+        print(f"Evaluation loss: {current_nll_losses}")
 
 
 if __name__ == "__main__":

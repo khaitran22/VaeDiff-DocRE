@@ -57,6 +57,65 @@ class Trainer:
             feature, target_labels = self._pair_encode(model, input_ids, labels, attention_mask, entity_pos, hts)
         return feature, target_labels
     
+    def eval(self):
+        self.vae.eval(); self.ema_diff.ema_model.eval(); self.diff_net.eval()
+        nll_losses = []
+        batch_sizes = []
+        epoch = self.args.warmup_epochs
+        
+        for step, batch in enumerate(tqdm(self.dev_dataloader, desc='Testing')):
+            with torch.no_grad():
+                inputs = {
+                    'model': self.model,
+                    'input_ids': batch[0].to(self.args.device),
+                    'attention_mask': batch[1].to(self.args.device),
+                    'labels': batch[2], 
+                    'entity_pos': batch[3],
+                    'hts': batch[4],
+                }
+                device = inputs['input_ids'].device
+                
+                feature, labels = self._embed_pair(**inputs)
+                mask = labels[:, 0] != 1
+                feature = feature[mask, :]
+                labels = labels[mask, :]
+                
+                bs, _ = feature.size()
+                logits, all_p_latent, all_log_p = self.vae(feature)
+                output = self.vae.decoder_output(logits)
+                vae_recon_loss = self.vae.reconstruction_loss(output, feature)
+
+                model_kwargs = {
+                    'class_id': labels
+                }
+                t, weights = self.schedule_sampler.sample(bs, device)
+                compute_losses = partial(
+                    self.diff_process.training_losses,
+                    self.ema_diff.ema_model,
+                    all_p_latent,
+                    t,
+                    True,
+                    model_kwargs=model_kwargs,
+                )
+                losses = compute_losses()
+                diff_loss = losses['loss'].mean()
+    
+                cross_entropy_per_var = weights.unsqueeze(-1) * diff_loss.unsqueeze(-1)
+                all_neg_log_p = cross_entropy_per_var + self.diff_process.cross_entropy_const(torch.zeros_like(t, dtype=t.dtype, device=t.device), all_p_latent)
+                kl_all_list, kl_vals_per_group, kl_diag_list = kl_per_group_vada(all_log_p, all_neg_log_p)
+                kl_coeff = self.args.kl_coeff if epoch >= self.args.warmup_epochs else 1e-6
+                balanced_kl, kl_coeffs, kl_vals = kl_balancer(kl_all_list, kl_coeff, kl_balance=False)
+                
+                loss_vae = (vae_recon_loss + balanced_kl) / bs
+                nll_losses.append(loss_vae.item())
+                batch_sizes.append(bs)
+        
+        dev_nll_losses = np.array(nll_losses).sum()
+        dev_batch_size = np.array(batch_sizes).sum()
+        current_nll_losses = dev_nll_losses / dev_batch_size
+
+        return current_nll_losses
+    
     def train(self, wandb):
         train_iterator = range(int(self.args.num_train_epochs))
         print("Total epochs: {}".format(self.args.num_train_epochs))
@@ -232,18 +291,15 @@ class Trainer:
         dev_nll_losses = np.array(nll_losses).sum()
         dev_batch_size = np.array(batch_sizes).sum()
         current_nll_losses = dev_nll_losses / dev_batch_size
-        wandb.log(
-            {
-                "Dev Loss NLL": current_nll_losses,
-            }, 
-            step=num_steps
-        )
-        if current_nll_losses < best_nll_score:
-            best_nll_score = current_nll_losses
-            print(f"Epoch {epoch+1}: {current_nll_losses} - Step: {num_steps} - Best loss!")
-        else:
-            print(f"Epoch {epoch+1}: {current_nll_losses} - Step: {num_steps}")
-        torch.save(self.vae.state_dict(), self.args.save_path_vae)
-        torch.save(self.ema_diff.state_dict(), self.args.save_path_diff)
-        print("-------------------")
+        if not self.args.evaluation:
+            wandb.log(
+                {
+                    "Dev Loss NLL": current_nll_losses,
+                }, 
+                step=num_steps
+            )
+            if current_nll_losses < best_nll_score:
+                best_nll_score = current_nll_losses
+            torch.save(self.vae.state_dict(), self.args.save_path_vae)
+            torch.save(self.ema_diff.state_dict(), self.args.save_path_diff)
         return best_nll_score
