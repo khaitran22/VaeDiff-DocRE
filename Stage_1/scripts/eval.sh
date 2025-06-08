@@ -1,5 +1,5 @@
 python train.py \
- --data_dir ./docred_data/ \
+ --data_dir VaeDiff-DocRE/docred_data/ \
  --transformer_type bert \
  --model_name_or_path bert-base-cased \
  --train_file train_revised.json \
@@ -18,5 +18,5 @@ python train.py \
  --num_class 97 \
  --tau 1.0 \
  --tau_base 0.5 \
- --load_path ./chkpoints/kd_baseline.pt \
+ --load_path VaeDiff-DocRE/Stage_1/chkpoints/kd_baseline.pt \
  --evaluation_steps 5000

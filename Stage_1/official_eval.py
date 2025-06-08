@@ -32,15 +32,15 @@ def gen_train_facts(data_file_name, truth_dir):
 output_dir = 'scores'
 
 
-truth_dir = './docred_data/'
+truth_dir = 'VaeDiff-DocRE/docred_data/'
 
 
 if  os.path.isdir(truth_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    fact_in_train_annotated = gen_train_facts("./docred_data/train_annotated.json", truth_dir)
-    fact_in_train_distant = gen_train_facts("./docred_data/train_distant.json", truth_dir)
+    fact_in_train_annotated = gen_train_facts("VaeDiff-DocRE/docred_data/train_annotated.json", truth_dir)
+    fact_in_train_distant = gen_train_facts("VaeDiff-DocRE/docred_data/train_distant.json", truth_dir)
 
     output_filename = os.path.join(output_dir, 'scores.txt')
     output_file = open(output_filename, 'w')
