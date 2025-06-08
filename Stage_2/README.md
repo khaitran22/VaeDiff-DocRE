@@ -1,5 +1,5 @@
 # Stage 2 - VaeDiff-DocRE
-Implementation of Stage 2 in VaeDiff-DocRE.
+Implementation of Stage 2 in [VaeDiff-DocRE](https://aclanthology.org/2025.coling-main.488/).
 
 ## Environment setup
 ```bash
