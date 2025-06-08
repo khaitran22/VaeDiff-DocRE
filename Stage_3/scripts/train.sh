@@ -1,0 +1,35 @@
+python3 VaeDiff-DocRE/Stage_3/train.py \
+ --data_dir VaeDiff-DocRE/docred_data/ \
+ --transformer_type bert \
+ --model_name_or_path bert-base-cased \
+ --train_file train_revised.json \
+ --dev_file dev_revised.json \
+ --test_file test_revised.json \
+ --train_batch_size 4 \
+ --test_batch_size 8 \
+ --gradient_accumulation_steps 1 \
+ --num_labels 4 \
+ --learning_rate 3e-5 \
+ --classifier_lr 1e-4 \
+ --max_grad_norm 1.0 \
+ --warmup_ratio 0.06 \
+ --num_train_epochs 30.0 \
+ --seed 66 \
+ --num_class 97 \
+ --tau 1.0 \
+ --tau_base 0.5 \
+ --save_path VaeDiff-DocRE/Stage_3/chkpoints/vaediff_docre.pt \
+ --evaluation_steps 5000 \
+ --warmup_epochs 5.0 \
+ --load_path_vae VaeDiff-DocRE/Stage_2/chkpoints/vae.pt \
+ --load_path_ema_diff VaeDiff-DocRE/Stage_2/chkpoints/diff_ema.pt \
+ --diffusion_steps 50 \
+ --noise_schedule cosine \
+ --latent_size 384 \
+ --tx_dim 256 \
+ --class_conditional \
+ --self_condition \
+ --scale_shift \
+ --predict_xstart \
+ --th_prob 0.2 \
+ --output_name VaeDiff-DocRE/Stage_3/scripts/results.json
